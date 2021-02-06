@@ -14,7 +14,7 @@ private class CustomDataSource: UITableViewDiffableDataSource<Int, String> {
   override func tableView(_: UITableView, canMoveRowAt _: IndexPath) -> Bool {
     true
   }
-
+    
   override func tableView(_ tableView: UITableView, moveRowAt sourceIndexPath: IndexPath, to destinationIndexPath: IndexPath) {
     super.tableView(tableView, moveRowAt: sourceIndexPath, to: destinationIndexPath)
 
@@ -36,8 +36,8 @@ class RootViewController: UITableViewController {
   private lazy var dataSource = CustomDataSource(tableView: tableView) { (tableView, indexPath, rowData) -> UITableViewCell? in
     let cell = tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath)
     cell.textLabel?.text = rowData
-
-    cell.shouldIndentWhileEditing = false // Code to disable left indent does not work at all
+    cell.showsReorderControl = true
+//    cell.shouldIndentWhileEditing = false // Code to disable left indent does not work at all
 
     return cell
   }
@@ -48,8 +48,8 @@ class RootViewController: UITableViewController {
     
     title = "UITableViewDiffableDataSource"
 
-    tableView.isEditing = true
-    isEditing = true
+//    tableView.isEditing = true
+//    isEditing = true
 
     tableView.register(UITableViewCell.self, forCellReuseIdentifier: "Cell")
 
@@ -57,9 +57,15 @@ class RootViewController: UITableViewController {
     dataSource.moveRow = moveRow(fromIndex:toIndex:)
     loadData()
 
-    navigationItem.rightBarButtonItem = UIBarButtonItem(title: "print", style: .plain, target: self, action: #selector(printDebug))
+    navigationItem.leftBarButtonItem = UIBarButtonItem(title: "print", style: .plain, target: self, action: #selector(printDebug))
+    navigationItem.rightBarButtonItem = self.editButtonItem
   }
 
+    override func setEditing(_ editing: Bool, animated: Bool) {
+        super.setEditing(editing, animated: animated)
+        tableView.setEditing(editing, animated: animated)
+    }
+    
   func loadData() {
     var snapshot = NSDiffableDataSourceSnapshot<Int, String>()
 
@@ -88,9 +94,9 @@ class RootViewController: UITableViewController {
     print("wip:", "cell:", cell?.isEditing)
   }
 
-  override func tableView(_: UITableView, moveRowAt sourceIndexPath: IndexPath, to destinationIndexPath: IndexPath) {
-    moveRow(fromIndex: sourceIndexPath.row, toIndex: destinationIndexPath.row)
-  }
+//  override func tableView(_: UITableView, moveRowAt sourceIndexPath: IndexPath, to destinationIndexPath: IndexPath) {
+//    moveRow(fromIndex: sourceIndexPath.row, toIndex: destinationIndexPath.row)
+//  }
 
 //  override func numberOfSections(in _: UITableView) -> Int {
 //    1
@@ -113,4 +119,8 @@ class RootViewController: UITableViewController {
   {
     .none // Disable the delete button BUT there's unexpected left indent
   }
+    
+    override func tableView(_ tableView: UITableView, shouldIndentWhileEditingRowAt indexPath: IndexPath) -> Bool {
+        false
+    }
 }
